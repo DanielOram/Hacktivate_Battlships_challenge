@@ -16,7 +16,7 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/Hacktivate_Battlships_challenge$BattleshipBots.coverage" NAME="BattleshipBots Coverage Results" MODIFIED="1437802551107" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/resources" />
+    <SUITE FILE_PATH="coverage/Hacktivate_Battlships_challenge$BattleshipBots.coverage" NAME="BattleshipBots Coverage Results" MODIFIED="1437802824883" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/resources" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -72,8 +72,8 @@
       <file leaf-file-name="current_state.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/LiveData/SandBoxTorpedoBot/current_state.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-12.041667">
-              <caret line="198" column="10" selection-start-line="198" selection-start-column="10" selection-end-line="198" selection-end-column="10" />
+            <state vertical-scroll-proportion="-11.416667">
+              <caret line="197" column="10" selection-start-line="197" selection-start-column="10" selection-end-line="197" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -82,8 +82,8 @@
       <file leaf-file-name="TorpedoBot.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources/Bots/TorpedoBot/TorpedoBot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4044665">
-              <caret line="298" column="8" selection-start-line="298" selection-start-column="8" selection-end-line="298" selection-end-column="8" />
+            <state vertical-scroll-proportion="0.3300248">
+              <caret line="260" column="29" selection-start-line="260" selection-start-column="29" selection-end-line="260" selection-end-column="29" />
               <folding>
                 <element signature="e#57#68#0" expanded="true" />
               </folding>
@@ -667,8 +667,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/LiveData/SandBoxTorpedoBot/current_state.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.041667">
-          <caret line="198" column="10" selection-start-line="198" selection-start-column="10" selection-end-line="198" selection-end-column="10" />
+        <state vertical-scroll-proportion="-11.416667">
+          <caret line="197" column="10" selection-start-line="197" selection-start-column="10" selection-end-line="197" selection-end-column="10" />
           <folding />
         </state>
       </provider>
@@ -701,8 +701,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/Bots/TorpedoBot/TorpedoBot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4044665">
-          <caret line="298" column="8" selection-start-line="298" selection-start-column="8" selection-end-line="298" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.3300248">
+          <caret line="260" column="29" selection-start-line="260" selection-start-column="29" selection-end-line="260" selection-end-column="29" />
           <folding>
             <element signature="e#57#68#0" expanded="true" />
           </folding>

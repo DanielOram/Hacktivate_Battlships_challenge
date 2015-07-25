@@ -224,25 +224,41 @@ def rockets_algorithm(current_state):
 
 
 def fire_rockets(current_state):
-	"""Fire random shots!"""
+    """Fire random shots!"""
 
-	# Get the parameters
-	board_size = current_state['BoardSize']
-	rocket_count = current_state['Rockets']
+    # Get the parameters
+    board_size = current_state['BoardSize']
+    rocket_count = current_state['Rockets']
 
-	'''
+    radius = 100
+    rangeX = (0, board_size[0])
+    rangeY = (0, board_size[1])
+
+
+    # Generate a set of all points within 200 of the origin, to be used as offsets later
+    # There's probably a more efficient way to do this.
+    deltas = set()
+    for x in range(-radius, radius+1):
+        for y in range(-radius, radius+1):
+            if x*x + y*y <= radius*radius:
+                deltas.add((x,y))
+
+    randpoints = []
+    excluded = set()
+    i = 0
+
     # Fire the rockets!!
     shots=[]
     for p in range(rocket_count):
-        x = random.randrange(0, board_size[0])
-        y = random.randrange(0, board_size[1])
-        shot = '%d, %d' % (x, y)
-        shots.append(shot)
-        '''
-
-
-	#return {'Rocket': shots}
-	return rockets_algorithm(current_state)
+                x = random.randrange(*rangeX)
+                y = random.randrange(*rangeY)
+                if (x,y) in excluded:
+                    continue
+                randpoints.append((x,y))
+                excluded.update((x+dx, y+dy) for (dx,dy) in deltas)
+                shot = '%d, %d' % (x, y)
+                shots.append(shot)
+    return {'Rocket' : shots}
 
 
 def create_insult(current_state):
