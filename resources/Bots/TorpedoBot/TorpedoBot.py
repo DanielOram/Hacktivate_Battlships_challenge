@@ -19,31 +19,160 @@ def write_response(response, file_name):
 		f.write(json.dumps(response, sort_keys=True, indent=4))
 
 
+def hard_place_ship(current_state):
+
+	board_size = current_state['BoardSize']
+	ships = current_state['ShipDescription']
+
+	board = []
+	for k in xrange(board_size[1]):
+		board.append(['_'] * board_size[0])
+
+
+	board[38][1] = '5'
+	board[38][5] = '3'
+	board[38][6] = '3'
+	board[38][7] = '3'
+	board[38][10] = '3'
+	board[38][11] = '3'
+	board[38][12] = '3'
+	board[38][15] = '4'
+	board[38][16] = '4'
+	board[38][17] = '4'
+	board[38][18] = '4'
+	board[38][21] = '5'
+	board[38][22] = '5'
+	board[38][23] = '5'
+	board[38][24] = '5'
+	board[38][25] = '5'
+	board[38][28] = '3'
+	board[38][29] = '3'
+	board[38][30] = '3'
+	board[38][33] = '2'
+	board[38][34] = '2'
+	board[38][37] = '2'
+	board[38][38] = '2'
+
+	board[37][1] = '5'
+	board[36][1] = '5'
+	board[35][1] = '5'
+	board[34][1] = '5'
+
+	board[36][4] = '4'
+	board[35][4] = '4'
+	board[34][4] = '4'
+	board[33][4] = '4'
+
+	board[35][7] = '3'
+	board[35][8] = '3'
+	board[35][9] = '3'
+
+	result = []
+	for row in board:
+		result.append(''.join(row))
+
+	return {'Board':result}
+
 def random_place_ship(board, name, tag):
 	"""Helper function to randomly place a ship"""
 
-	# Find the length of the tag
+	#Find the length of the tag
 	tag_len = len(tag)
 
-	# Generate a random direction
+	#Generate a random direction
 	dx = random.randrange(2)
 	dy = 1 - dx
+	TopOrBottom = random.randrange(4)
+	# 0 = top, 1 = right, 2 = bottom, 3 = left
 
-	# Find a random start location, don't trip off the edge of the board!
-	x = random.randrange(len(board[0]) - dx * tag_len)
-	y = random.randrange(len(board) - dy * tag_len)
+	#Find a random start location, don't trip off the edge of the board!
+	if TopOrBottom == 0:
+		x = random.randrange(len(board[0]) - dx * tag_len - 2) + 1
+		y = random.randrange(4) + 1
 
-	# Can we place it here?
-	for i in xrange(tag_len):
-		if board[y + i * dy][x + i * dx] != '_':
-			return False
+	elif TopOrBottom == 2:
+		x = random.randrange(len(board[0]) - dx * tag_len - 2) + 1
+		y = random.randrange(4) + 35
 
-	# Yes! Lets place it down!
+	elif TopOrBottom == 3:
+		x = random.randrange(4) + 1
+		y = random.randrange(len(board) - dy * tag_len - 2) + 1
+
+	else:
+		x = random.randrange(4) + 35
+		y = random.randrange(len(board) - dy * tag_len - 2) + 1
+
+
+	try:
+		#Can we place it here?
+		for i in xrange(tag_len):
+			if board[y + i * dy][x + i * dx] != '_':
+				return False
+
+		#Is there a ship within 2 square?
+		if dx == 0:
+			#1 square?
+			for i in xrange(tag_len):
+				if board[y + i * dy][x - 1] != '_':
+					return False
+				if board[y + i * dy][x + 1] != '_':
+					return False
+
+			if board[y - 1][x] != '_' or board[y + tag_len][x] != '_':
+				return False
+
+			#2 squares?
+			if x > 1 and x < 38:
+				for i in xrange(tag_len):
+					if board[y + i * dy][x - 2] != '_':
+						return False
+					if board[y + i * dy][x + 2] != '_':
+						return False
+
+				if y > 1 and y < 38:
+					if board[y - 2][x] != '_' or board[y + tag_len + 1][x] != '_':
+						return False
+
+		else:
+			#1 square?
+			for i in xrange(tag_len):
+				if board[y - 1][x + i * dy] != '_':
+					return False
+				if board[y + 1][x + i * dy] != '_':
+					return False
+			if board[y][x - 1] != '_' or board[y][x + tag_len] != '_':
+				return False
+
+			#2 squares?
+			if y > 1 and y < 38:
+				for i in xrange(tag_len):
+					if board[y - 2][x + i * dy] != '_':
+						return False
+					if board[y + 2][x + i * dy] != '_':
+						return False
+			if x > 1 and x < 38:
+				if board[y][x - 2] != '_' or board[y][x + tag_len + 1] != '_':
+					return False
+
+	except:
+		return False
+
+	#Yes! Lets place it down!
 	for i in xrange(tag_len):
 		board[y + i * dy][x + i * dx] = tag[i]
+		if dx == 0:
+			board[y + i * dy][x + 1] = 'x'
+			board[y + i * dy][x - 1] = 'x'
+			board[y - 1][x] = 'x'
+			board[y + tag_len][x] = 'x'
+
+		else:
+			board[y + 1][x + i * dx] = 'x'
+			board[y - 1][x + i * dx] = 'x'
+			board[y][x - 1] = 'x'
+			board[y][x + tag_len] = 'x'
 
 	return True
-
 
 def do_initial_placement(current_state):
 	"""A simple random placement"""
@@ -64,12 +193,17 @@ def do_initial_placement(current_state):
 			if random_place_ship(board, name, tag):
 				break
 
-	# Pack the board tighter
+	for i in xrange(40):
+		for j in xrange(40):
+			if board[i][j] == 'x':
+				board[i][j] = '_'
+
+	#Pack the board tighter
 	result = []
 	for row in board:
 		result.append(''.join(row))
 
-	return {'Board': result}
+	return {'Board':result}
 
 
 # Daniels algorithm method
