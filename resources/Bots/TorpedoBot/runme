@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-./Monty.py current_state.json current_move.json
+./TorpedoBot.py current_state.json current_move.json
