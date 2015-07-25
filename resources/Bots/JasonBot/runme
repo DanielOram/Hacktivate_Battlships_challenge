@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+/usr/local/bin/node Jason.js current_state.json current_move.json

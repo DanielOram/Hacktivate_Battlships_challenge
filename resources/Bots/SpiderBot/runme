@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+./Spider.py current_state.json current_move.json
