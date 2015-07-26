@@ -30,7 +30,7 @@ class Stock:
         self.invalid_shots = self.all_hits + self.all_misses
         response['InvalidShots'] = self.invalid_shots
 
-        self.write_response(response, 'current_stock')
+        self.write_response(response, 'shots')
 
 
     def is_valid_shot(self,shot):
