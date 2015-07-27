@@ -47,7 +47,7 @@ def do_initial_placement(current_state):
 	"""A simple random placement"""
 
 	#create shots.json file
-	write_response({'AllHits': [-1,-1], 'AllMisses': [-1,-1]},'shots')
+	write_response({'Bot Name': 'TorpedoBot','AllHits': [], 'AllMisses': []},'shots.json')
 
 	# Get the parameters
 	board_size = current_state['BoardSize']
@@ -72,85 +72,145 @@ def do_initial_placement(current_state):
 
 	return {'Board':result}
 
-def get_prev_shots():
-	shot_json = read_state('shots')
-	all_hits = shot_json['AllHits']
-	all_misses = shot_json['AllMisses']
-	all_shots = all_hits + all_misses
-	return all_shots
+
+def get_prev_shots(shots_state):
+    all_shots = shots_state['AllHits'] + shots_state['AllMisses']
+    print("all shots= " + str(all_shots))
+    return all_shots
+
+#this is a good method
+def update_shots(current_state,shots_state):
+    updated_hits = shots_state['AllHits'] + current_state['LastRocketHit']
+    updated_misses = shots_state['AllMisses'] + current_state['LastRocketMiss']
+    updated_shots_response = {'AllHits': updated_hits, 'AllMisses': updated_misses}
+    write_response(updated_shots_response,'shots.json')
+
+#hits is a list of hit coordinates
+def target(hits):
+    shots = []
+    for h in hits:
+        #left
+        if h[0]==0:
+            #top left - 2
+            if h[1]==0:
+                shots.append([h[0]+1, h[1]])
+                shots.append([h[0], h[1]+1])
+            #bottom left - 2
+            elif h[1]==39:
+                shots.append([h[0], h[1]-1])
+                shots.append([h[0]+1, h[1]])
+            #left edge - 2
+            elif h[1]>0 and h[1]<39:
+                shots.append([h[0], h[1]-1])
+                shots.append([h[0], h[1]+1])
+        #right
+        if h[0]==39:
+            #top right - 2
+            if h[1]==0:
+                shots.append([h[0]-1, h[1]])
+                shots.append([h[0], h[1]+1])
+            #bottom right - 2
+            elif h[1]==39:
+                shots.append([h[0], h[1]-1])
+                shots.append([h[0]-1, h[1]])
+            #right edge - 2
+            elif h[1]>0 and h[1]<39:
+                shots.append([h[0], h[1]-1])
+                shots.append([h[0], h[1]+1])
+        #top
+        if h[1]==0:
+            #top edge - 2
+            if h[0]>0 and h[0]<39:
+                shots.append([h[0]-1, h[1]])
+                shots.append([h[0]+1, h[1]])
+        #bottom
+        if h[1]==39:
+            #bottom edge
+            if h[0]>0 and h[0]<39:
+                shots.append([h[0]-1, h[1]])
+                shots.append([h[0]+1, h[1]])
+        #inner board square
+        if h[0]>0 and h[0]<39 and h[1]>0 and h[1]<39:
+            shots.append([h[0], h[1]-1])
+            shots.append([h[0], h[1]+1])
+            shots.append([h[0]-1, h[1]])
+            shots.append([h[0]+1, h[1]])
+
+    return shots
 
 
-def create_all_rockets(rocket_count,board_size):
-	print("debug")
-	prev_shots = get_prev_shots()
-	print("debug1")
-	shots=[]
-	x = random.randrange(0, board_size[0])
-	y = random.randrange(0, board_size[1])
-	shot = '%d, %d' % (x, y)
-	print('debug2')
-	#problem here with the code taking more than 5 seconds!! wtf!!
-	for p in range(rocket_count):
-		while not shot in prev_shots:
-			x = random.randrange(0, board_size[0])
-			y = random.randrange(0, board_size[1])
-			shot = '%d, %d' % (x, y)
-		shots.append(shot)
-	print("debug3")
-	return {'Rocket' : shots}
+def fire_rockets(current_state,shots_state):
+    """Fire random shots!"""
 
-def fire_rockets(current_state):
-	"""Fire random shots!"""
+    # Get the parameters
+    board_size = current_state['BoardSize']
+    rocket_count = current_state['Rockets']
 
-	# Get the parameters
-	board_size = current_state['BoardSize']
-	rocket_count = current_state['Rockets']
+    shots = []
 
+    #update hits and misses
+    update_shots(current_state,shots_state)
 
+    #number of hits
+    hits = current_state['LastRocketHit']
 
-	'''
-	# Fire the rockets!!
-	shots=[]
-	for p in range(rocket_count):
-		x = random.randrange(0, board_size[0])
-		y = random.randrange(0, board_size[1])
-		shot = '%d, %d' % (x, y)
-		shots.append(shot)
+    #previous shots
+    prev_shots = get_prev_shots(shots_state)
 
-	return {'Rocket' : shots}
-	'''
-	return create_all_rockets(rocket_count,board_size)
+    #algorithm for getting next hit
+    targeted_hits = list(set(target(hits)))
+    #take out invalid shots
+    targeted_hits = [hit for hit in targeted_hits if hit not in prev_shots]
+    print("targeted_after = " + str(targeted_hits))
+
+    rocket_count = rocket_count-len(targeted_hits)
+
+    #create random rockets
+    for p in range(rocket_count):
+        invalid_shot = True
+        while invalid_shot:
+            x = random.randrange(0, board_size[0])
+            y = random.randrange(0, board_size[1])
+            shot = '%d, %d' % (x, y)
+            if not shot in prev_shots and not shot in targeted_hits:
+                invalid_shot = False
+        shots.append(shot)
+
+    return {'Rocket' : shots}
 
 def create_insult(current_state):
 	"""Creates an awesome insult"""
 	return '%s smells like toast!' % current_state['VillianName']
 
 def do_everything():
-	"""Does EVERYTHING"""
+    """Does EVERYTHING"""
 
-	#First, get our input and output file names
-	current_state_file_name = sys.argv[-2]
-	current_move_file_name = sys.argv[-1]
+    #First, get our input and output file names
+    current_state_file_name = sys.argv[-2]
+    current_move_file_name = sys.argv[-1]
 
-	#Read the state from disk
-	current_state = read_state(current_state_file_name)
+    #Read the state from disk
+    current_state = read_state(current_state_file_name)
 
-	#Optional, dump the current state to stdout (for debugging)
-	#print json.dumps(current_state, sort_keys = True, indent = 4)
+    #Optional, dump the current state to stdout (for debugging)
+    #print json.dumps(current_state, sort_keys = True, indent = 4)
 
-	#Which phase are we in?
-	action = current_state['Action']
+    #Which phase are we in?
+    action = current_state['Action']
 
-	#OK, lets act!
-	if action == 'Place':
-		response = do_initial_placement(current_state)
-	else:
-		response = fire_rockets(current_state)
+    #read the shots state from file
+    shots_state = read_state('shots.json')
 
-	response['Taunt'] = create_insult(current_state)
+    #OK, lets act!
+    if action == 'Place':
+        response = do_initial_placement(current_state)
+    else:
+        response = fire_rockets(current_state,shots_state)
 
-	#Write our response back to disk
-	write_response(response, current_move_file_name)
+    response['Taunt'] = create_insult(current_state)
+
+    #Write our response back to disk
+    write_response(response, current_move_file_name)
 
 
 #Lets do it!
