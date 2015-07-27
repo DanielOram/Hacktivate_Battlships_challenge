@@ -82,6 +82,7 @@ def get_prev_shots(shots_state):
 def update_shots(current_state,shots_state):
     updated_hits = shots_state['AllHits'] + current_state['LastRocketHit']
     updated_misses = shots_state['AllMisses'] + current_state['LastRocketMiss']
+    print("UPDATED MISSES === " + str(updated_misses))
     updated_shots_response = {'AllHits': updated_hits, 'AllMisses': updated_misses}
     write_response(updated_shots_response,'shots.json')
 
@@ -93,48 +94,48 @@ def target(hits):
         if h[0]==0:
             #top left - 2
             if h[1]==0:
-                shots.append([h[0]+1, h[1]])
-                shots.append([h[0], h[1]+1])
+                shots.append((h[0]+1, h[1]))
+                shots.append((h[0], h[1]+1))
             #bottom left - 2
             elif h[1]==39:
-                shots.append([h[0], h[1]-1])
-                shots.append([h[0]+1, h[1]])
+                shots.append((h[0], h[1]-1))
+                shots.append((h[0]+1, h[1]))
             #left edge - 2
             elif h[1]>0 and h[1]<39:
-                shots.append([h[0], h[1]-1])
-                shots.append([h[0], h[1]+1])
+                shots.append((h[0], h[1]-1))
+                shots.append((h[0], h[1]+1))
         #right
         if h[0]==39:
             #top right - 2
             if h[1]==0:
-                shots.append([h[0]-1, h[1]])
-                shots.append([h[0], h[1]+1])
+                shots.append((h[0]-1, h[1]))
+                shots.append((h[0], h[1]+1))
             #bottom right - 2
             elif h[1]==39:
-                shots.append([h[0], h[1]-1])
-                shots.append([h[0]-1, h[1]])
+                shots.append((h[0], h[1]-1))
+                shots.append((h[0]-1, h[1]))
             #right edge - 2
             elif h[1]>0 and h[1]<39:
-                shots.append([h[0], h[1]-1])
-                shots.append([h[0], h[1]+1])
+                shots.append((h[0], h[1]-1))
+                shots.append((h[0], h[1]+1))
         #top
         if h[1]==0:
             #top edge - 2
             if h[0]>0 and h[0]<39:
-                shots.append([h[0]-1, h[1]])
-                shots.append([h[0]+1, h[1]])
+                shots.append((h[0]-1, h[1]))
+                shots.append((h[0]+1, h[1]))
         #bottom
         if h[1]==39:
             #bottom edge
             if h[0]>0 and h[0]<39:
-                shots.append([h[0]-1, h[1]])
-                shots.append([h[0]+1, h[1]])
+                shots.append((h[0]-1, h[1]))
+                shots.append((h[0]+1, h[1]))
         #inner board square
         if h[0]>0 and h[0]<39 and h[1]>0 and h[1]<39:
-            shots.append([h[0], h[1]-1])
-            shots.append([h[0], h[1]+1])
-            shots.append([h[0]-1, h[1]])
-            shots.append([h[0]+1, h[1]])
+            shots.append((h[0], h[1]-1))
+            shots.append((h[0], h[1]+1))
+            shots.append((h[0]-1, h[1]))
+            shots.append((h[0]+1, h[1]))
 
     return shots
 
@@ -148,6 +149,8 @@ def fire_rockets(current_state,shots_state):
 
     shots = []
 
+    print('all hits = ' + str(current_state['LastRocketHit']))
+
     #update hits and misses
     update_shots(current_state,shots_state)
 
@@ -158,14 +161,17 @@ def fire_rockets(current_state,shots_state):
     prev_shots = get_prev_shots(shots_state)
 
     #algorithm for getting next hit
+    print('target - ' + str(target(hits)))
     targeted_hits = list(set(target(hits)))
     #take out invalid shots
     targeted_hits = [hit for hit in targeted_hits if hit not in prev_shots]
-    print("targeted_after = " + str(targeted_hits))
-
-    rocket_count = rocket_count-len(targeted_hits)
-
+    convert_target = lambda t: '{0:d}, {1:d}'.format(t[0], t[1])
+    list_targeted_hits = [convert_target(t) for t in targeted_hits]
+    print("targeted_after = " + str(list_targeted_hits))
+    rocket_count = rocket_count-len(list_targeted_hits)
+    print('rc = ' + str(rocket_count))
     #create random rockets
+    shots = shots + list_targeted_hits
     for p in range(rocket_count):
         invalid_shot = True
         while invalid_shot:
@@ -175,7 +181,7 @@ def fire_rockets(current_state,shots_state):
             if not shot in prev_shots and not shot in targeted_hits:
                 invalid_shot = False
         shots.append(shot)
-
+    print("SHOTS TO BE FIRED __________ = "+str(shots))
     return {'Rocket' : shots}
 
 def create_insult(current_state):
