@@ -75,14 +75,12 @@ def do_initial_placement(current_state):
 
 def get_prev_shots(shots_state):
     all_shots = shots_state['AllHits'] + shots_state['AllMisses']
-    print("all shots= " + str(all_shots))
     return all_shots
 
 #this is a good method
 def update_shots(current_state,shots_state):
     updated_hits = shots_state['AllHits'] + current_state['LastRocketHit']
     updated_misses = shots_state['AllMisses'] + current_state['LastRocketMiss']
-    print("UPDATED MISSES === " + str(updated_misses))
     updated_shots_response = {'AllHits': updated_hits, 'AllMisses': updated_misses}
     write_response(updated_shots_response,'shots.json')
 
@@ -149,7 +147,6 @@ def fire_rockets(current_state,shots_state):
 
     shots = []
 
-    print('all hits = ' + str(current_state['LastRocketHit']))
 
     #update hits and misses
     update_shots(current_state,shots_state)
@@ -161,15 +158,12 @@ def fire_rockets(current_state,shots_state):
     prev_shots = get_prev_shots(shots_state)
 
     #algorithm for getting next hit
-    print('target - ' + str(target(hits)))
     targeted_hits = list(set(target(hits)))
     #take out invalid shots
     targeted_hits = [hit for hit in targeted_hits if hit not in prev_shots]
     convert_target = lambda t: '{0:d}, {1:d}'.format(t[0], t[1])
     list_targeted_hits = [convert_target(t) for t in targeted_hits]
-    print("targeted_after = " + str(list_targeted_hits))
     rocket_count = rocket_count-len(list_targeted_hits)
-    print('rc = ' + str(rocket_count))
     #create random rockets
     shots = shots + list_targeted_hits
     for p in range(rocket_count):
@@ -181,7 +175,6 @@ def fire_rockets(current_state,shots_state):
             if not shot in prev_shots and not shot in targeted_hits:
                 invalid_shot = False
         shots.append(shot)
-    print("SHOTS TO BE FIRED __________ = "+str(shots))
     return {'Rocket' : shots}
 
 def create_insult(current_state):
